@@ -10,16 +10,17 @@ public class MyMoney : MonoBehaviour
         //void GetMoney()
     }
 
-    public void GetMoney(int giveMoney)
+    public void OperationWithMoney(int _Money)
     {
-        //_myMoney += giveMoney;
-        if (_myMoney + giveMoney < _myMoney)
+        
+        if (_myMoney + _Money < 0)
         {
-            Debug.Log("У меня недостаточно денег!");
+            Debug.Log("Недостаточно денежных средств!");
         }
         else
         {
-            Debug.Log(_myMoney += giveMoney);
+            _myMoney += _Money;
+            Debug.Log("Остаток денежных средств = " + _myMoney);
         }
     }
 

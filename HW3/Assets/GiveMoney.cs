@@ -4,10 +4,10 @@ public class GiveMoney : MonoBehaviour
 {
     [SerializeField] private MyMoney myMoney;
     [SerializeField] private int _giveMoney;
-    private void Start()
+    public void OnButtonGive()
     {
 
-        myMoney.GetMoney(_giveMoney);
+        myMoney.OperationWithMoney(_giveMoney);
 
     }
 }

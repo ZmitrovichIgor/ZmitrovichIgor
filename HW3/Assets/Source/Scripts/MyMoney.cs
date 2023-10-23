@@ -2,17 +2,10 @@ using UnityEngine;
 
 public class MyMoney : MonoBehaviour
 {
-
     [SerializeField] private int _myMoney;
 
-    void Start()
-    {
-        //void GetMoney()
-    }
-
     public void OperationWithMoney(int _Money)
-    {
-        
+    { 
         if (_myMoney + _Money < 0)
         {
             Debug.Log("Недостаточно денежных средств!");
@@ -23,6 +16,5 @@ public class MyMoney : MonoBehaviour
             Debug.Log("Остаток денежных средств = " + _myMoney);
         }
     }
-
 }
 

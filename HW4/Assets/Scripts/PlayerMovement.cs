@@ -7,7 +7,9 @@ using static UnityEditor.PlayerSettings;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private Rigidbody _rigidbody;
+    [SerializeField] private Rigidbody _enemyRigidbody;
     [SerializeField] private float _speed;
+    [SerializeField] private float _force;
     [SerializeField] private Mass _mass;
     private float _enemyCount = 0;
 
@@ -47,17 +49,21 @@ public class PlayerMovement : MonoBehaviour
         {
             if(_mass.Amount > collision.gameObject.GetComponent<Mass>().Amount)
             {
+                _enemyRigidbody = collision.gameObject.GetComponent<Cube>();
+                Vector3 normalVector = (collision.transform.position + transform.position).normalized;
+                _enemyRigidbody.AddForce(normalVector * _force, ForceMode.Impulse);
+
                 _enemyCount += 1;
                 _mass.Amount += collision.gameObject.GetComponent<Mass>().Amount;
                 transform.localScale = new Vector3(_mass.Amount, _mass.Amount, _mass.Amount);
-                Destroy(collision.gameObject);
+                Destroy(collision.gameObject, 0.5f);
                 Debug.Log("You eat = " + _enemyCount + " enemys");
                 Debug.Log("+ " + collision.gameObject.GetComponent<Mass>().Amount + " mass");
                 Debug.Log("You mass = " + _mass.Amount);
             }
             else
             {
-                Destroy(gameObject, .5f);
+                Destroy(gameObject, 0.5f);
                 Debug.Log("Game over!");
             }
         }

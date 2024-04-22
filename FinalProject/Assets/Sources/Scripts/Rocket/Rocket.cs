@@ -7,34 +7,42 @@ public class Rocket : MonoBehaviour
     public Action<int> OnCoinsTrigger;
     public Action<int> OnFuelChange;
     public Action<int> OnHeathChange;
-    public Action<bool> FuelEnd;
+    public Action<bool> OnPause;
     
-    [field: SerializeField] public int FuelQuantity { get; set; }
-    //[field: SerializeField] public int CoinsQuantity { get; private set; }
-    [field: SerializeField] public int Health { get; set; }
+    [field: SerializeField] public int CurrentFuel { get; set; }
+    [field: SerializeField] public int MaxFuel { get; set; }
+    [field: SerializeField] public int CurrentHealth { get; set; }
+    [field: SerializeField] public int MaxHealth { get; set; }
     [field: SerializeField] public bool IsFly { get; set; }
+    [field: SerializeField] public bool IsPause { get; set; }
     [field: SerializeField] public float HightReached { get; set; }
-    
+
+    private Rigidbody2D _rigidbody;
+
     private void Awake()
     {
-        OnFuelChange?.Invoke(FuelQuantity);
-        OnHeathChange?.Invoke(Health);
+        CurrentFuel = MaxFuel;
+        CurrentHealth = MaxHealth;
+        OnFuelChange?.Invoke(CurrentFuel);
+        OnHeathChange?.Invoke(CurrentHealth);
+        _rigidbody = GetComponent<Rigidbody2D>();
     }
     
     public IEnumerator FuelCounter()
     {
-        if (FuelQuantity > 0)
+        if (CurrentFuel > 0)
         {
             yield return new WaitForSeconds(1);
-            --FuelQuantity;
-            OnFuelChange?.Invoke(FuelQuantity);
+            --CurrentFuel;
+            OnFuelChange?.Invoke(CurrentFuel);
+            HightReached = gameObject.transform.position.y;
             StartCoroutine(FuelCounter());   
         }
         else
         {
-            HightReached = gameObject.transform.position.y;
-            IsFly = false;
-            FuelEnd?.Invoke(true);
+            StopCoroutine(FuelCounter());
+            _rigidbody.velocity = Vector2.zero;
+            OnPause?.Invoke(true);
         }
     }
     
@@ -42,22 +50,22 @@ public class Rocket : MonoBehaviour
     {
         if (collider.gameObject.TryGetComponent(out Coin coin))
         {
-            //CoinsQuantity += coin.Value;
             OnCoinsTrigger?.Invoke(coin.Value);
         }
         if (collider.gameObject.TryGetComponent(out Fuel fuel))
         {
-            FuelQuantity += fuel.Amount;
-            OnFuelChange?.Invoke(FuelQuantity);
+            CurrentFuel += fuel.Amount;
+            OnFuelChange?.Invoke(CurrentFuel);
         }
         if (collider.gameObject.TryGetComponent(out Meteorite meteorite))
         {
-            --Health;
-            OnHeathChange?.Invoke(Health);
-            if (Health == 0)
+            --CurrentHealth;
+            OnHeathChange?.Invoke(CurrentHealth);
+            if (CurrentHealth == 0)
             {
-                Time.timeScale = 0;
-                Debug.Log("End");       
+                StopCoroutine(FuelCounter());
+                _rigidbody.velocity = Vector2.zero;
+                OnPause?.Invoke(true);
             }
             StartCoroutine(InvulnerabilityCounter(gameObject.layer, collider.gameObject.layer));
         }
